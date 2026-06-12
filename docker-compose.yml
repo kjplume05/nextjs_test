@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+    volumes:
+      - ./public/uploads:/app/public/uploads
+volumes:
+  postgres_data:
