@@ -1,14 +1,20 @@
 "use client"
 
+import "./globals.css"
 import { useEffect, useState } from "react"
 import type { Image } from "@/app/generated/prisma/client"
 import { fileToB64 } from "./lib/helpers"
+import ImagePreview from "@/components/ImagePreview" 
+import Button from "@/components/Button"
+import ImageUpload from "@/components/ImageUpload"
 
 export default function Home() {
   const [images, setImages] = useState<Image[]>([])
   const [file, setFile] = useState<File | null>(null)
   const [description, setDescription] = useState<string>("")
-  const [saveDisabled, setSaveDisabled] = useState<boolean>(true)
+  const [buttonsDisabled, setButtonsDisabled] = useState<boolean>(true)
+
+  useEffect(() => { fetchImages() }, [])
 
   async function fetchImages() {
     const res = await fetch("/api/upload")
@@ -20,7 +26,7 @@ export default function Home() {
     if (!file) {
       return
     }
-    setSaveDisabled(true)
+    setButtonsDisabled(true)
 
     const formData = new FormData()
     formData.append("file", file)
@@ -28,13 +34,17 @@ export default function Home() {
 
     await fetch("/api/upload", { method: "POST", body: formData })
     fetchImages()
-    setSaveDisabled(false)
+    setButtonsDisabled(false)
+    
   }
 
   async function handleDescription() {
     setDescription("")
-    setSaveDisabled(true)
-    if (!file) return 
+    setButtonsDisabled(true)
+    if (!file) {
+      console.log("NO FILE")
+      return
+    }
 
     const b64File = await fileToB64(file)
 
@@ -66,22 +76,25 @@ export default function Home() {
     }
 
     await read()
-    setSaveDisabled(false)
+    setButtonsDisabled(false)
     return
   }
 
-  useEffect(() => { fetchImages() }, [])
+  function onFileSelect (event: React.ChangeEvent<HTMLInputElement>) {
+    setFile(event.target.files?.[0] ?? null)
+    setDescription("")
+    setButtonsDisabled(false)
+  }
 
   return (
     <main style={{ padding: 40 }}>
       <h1>Image upload</h1>
-      <input type="file" accept="image/*" onChange={(event) => {
-        setFile(event.target.files?.[0] ?? null)
-        setDescription("")
-      }}/>
-      <button onClick={handleDescription}>DESCRIBE!</button>
-      <button onClick={handleUpload} disabled={saveDisabled}>SAVE!</button>
-      <div>{description}</div>
+      <div className="flex flex-col">
+        <ImageUpload onChange={onFileSelect} file={file}/>
+        <Button onClick={handleDescription} disabled={buttonsDisabled} extraStyles="bg-orange-300">DESCRIBE!</Button>
+        <Button onClick={handleUpload} disabled={buttonsDisabled} extraStyles="bg-green-300">SAVE!</Button>
+        <div>{description}</div>
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 32}}>
         {images.map(img => (
           <div key={img.id}>
