@@ -1,14 +1,13 @@
-"use client"
-
 import "./globals.css"
 import { useEffect, useState } from "react"
 import type { Image } from "@/app/generated/prisma/client"
-import { fileToB64 } from "./lib/helpers"
+import { fileToB64 } from "@/app/lib/helpers"
 import ImagePreview from "@/components/ImagePreview" 
 import Button from "@/components/Button"
 import ImageUpload from "@/components/ImageUpload"
+import LoginButton from "@/components/LoginButton"
 
-export default function Home() {
+export default function imageDescriber() {
   const [images, setImages] = useState<Image[]>([])
   const [file, setFile] = useState<File | null>(null)
   const [description, setDescription] = useState<string>("")
@@ -88,6 +87,7 @@ export default function Home() {
 
   return (
     <main style={{ padding: 40 }}>
+      <LoginButton/>
       <h1>Image upload</h1>
       <div className="flex flex-col">
         <ImageUpload onChange={onFileSelect} file={file}/>

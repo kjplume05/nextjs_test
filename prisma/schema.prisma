@@ -18,3 +18,13 @@ model Image {
   createdAt DateTime @default(now())
   description String?
 }
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String? 
+  createdAt DateTime @default(now())
+}
+
+// model Account {
+// }
