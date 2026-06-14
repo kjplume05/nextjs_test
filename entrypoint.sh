@@ -8,4 +8,10 @@ done
 
 echo "Finally the DB was ready!!!"
 
-exec npm start
+npm install
+
+if [ "$NODE_ENV" = "development" ]; then
+    exec npm run dev
+else 
+    exec npm start
+fi
